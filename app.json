@@ -21,6 +21,9 @@
         "NSCameraUsageDescription": "写真を撮影して投稿に添付するために使用します",
         "NSLocationWhenInUseUsageDescription": "投稿に位置情報を添付するために使用します",
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "entitlements": {
+        "aps-environment": "production"
       }
     },
     "android": {
