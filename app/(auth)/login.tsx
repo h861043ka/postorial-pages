@@ -18,7 +18,7 @@ export default function LoginScreen() {
   const [show2FA, setShow2FA] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [factorId, setFactorId] = useState("");
-  const { signIn, bannedMessage } = useAuth();
+  const { signIn, bannedMessage, refreshUser } = useAuth();
 
   const handleLogin = async () => {
     console.log("ログイン開始");
@@ -63,6 +63,13 @@ export default function LoginScreen() {
       }
 
       // 2FA不要の場合、または2FAチェックでエラーの場合、通常ログイン完了
+      console.log("ユーザー情報を更新");
+      try {
+        await refreshUser();
+        console.log("ユーザー情報更新完了");
+      } catch (refreshError) {
+        console.warn("ユーザー情報更新エラー（続行）:", refreshError);
+      }
       console.log("ログイン成功、ホームへ遷移");
       router.replace("/(tabs)");
     } catch (e: any) {

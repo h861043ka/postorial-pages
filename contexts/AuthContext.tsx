@@ -178,14 +178,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
-      if (profile) setUser(toUser(profile));
+    try {
+      console.log("refreshUser: セッション取得開始");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("refreshUser: セッション取得エラー:", sessionError);
+        throw sessionError;
+      }
+      console.log("refreshUser: セッション取得完了", session ? "あり" : "なし");
+
+      if (session?.user) {
+        console.log("refreshUser: プロフィール取得開始");
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("refreshUser: プロフィール取得エラー:", profileError);
+          throw profileError;
+        }
+
+        if (profile) {
+          console.log("refreshUser: ユーザー設定完了");
+          setUser(toUser(profile));
+        } else {
+          console.warn("refreshUser: プロフィールが見つかりません");
+        }
+      }
+    } catch (error: any) {
+      console.error("refreshUser: エラー:", error);
+      // AbortErrorの場合は再試行しない（ネットワーク問題）
+      if (error.name === "AbortError") {
+        console.warn("refreshUser: AbortError - ネットワークの問題の可能性");
+      }
+      throw error;
     }
   };
 
