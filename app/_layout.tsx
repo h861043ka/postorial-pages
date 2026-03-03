@@ -57,11 +57,11 @@ function RootLayoutNav() {
       }
     }
 
-    // 30秒のタイムアウト（ネットワーク遅延を考慮）
+    // 10秒のタイムアウト（速度優先）
     const timeout = setTimeout(() => {
-      console.warn("バージョンチェックがタイムアウトしました（30秒）");
+      console.warn("バージョンチェックがタイムアウトしました（10秒）");
       setVersionCheckDone(true);
-    }, 30000);
+    }, 10000);
 
     checkVersion().finally(() => clearTimeout(timeout));
   }, []);
