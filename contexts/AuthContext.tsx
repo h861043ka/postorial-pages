@@ -52,12 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .from("banned_users")
               .select("id")
               .eq("user_id", session.user.id)
-              .single(),
+              .maybeSingle(),
             supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
-              .single()
+              .maybeSingle()
           ]);
 
           if (bannedResult.data) {
@@ -95,12 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .from("banned_users")
               .select("id")
               .eq("user_id", session.user.id)
-              .single(),
+              .maybeSingle(),
             supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
-              .single()
+              .maybeSingle()
           ]);
 
           if (bannedResult.data) {

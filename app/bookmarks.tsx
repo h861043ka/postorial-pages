@@ -18,10 +18,19 @@ export default function BookmarksScreen() {
   const loadBookmarks = async () => {
     try {
       const data = await getBookmarkedPosts(50);
-      // データが正しい形式か確認してフィルタリング
-      const validPosts = (data || []).filter((post: any) =>
-        post && post.id && post.user && post.user.id
-      );
+      // データが正しい形式か確認してフィルタリング＆デフォルト値を追加
+      const validPosts = (data || [])
+        .filter((post: any) => post && post.id && post.user && post.user.id)
+        .map((post: any) => ({
+          ...post,
+          likesCount: post.likesCount || 0,
+          repliesCount: post.repliesCount || 0,
+          repostsCount: post.repostsCount || 0,
+          reactions: post.reactions || [],
+          isLiked: post.isLiked || false,
+          isReposted: post.isReposted || false,
+          isBookmarked: post.isBookmarked !== undefined ? post.isBookmarked : true,
+        }));
       setPosts(validPosts);
     } catch (e) {
       console.error("ブックマーク取得エラー:", e);
