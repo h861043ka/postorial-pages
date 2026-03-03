@@ -21,19 +21,26 @@ export default function LoginScreen() {
   const { signIn, bannedMessage } = useAuth();
 
   const handleLogin = async () => {
+    console.log("ログイン開始");
     if (!email.trim()) { setError("メールアドレスを入力してください"); return; }
     if (!password.trim()) { setError("パスワードを入力してください"); return; }
     setLoading(true);
     setError("");
     try {
+      console.log("Supabaseログイン呼び出し開始");
       // 通常のログイン
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
+      console.log("Supabaseログイン呼び出し完了", data ? "成功" : "失敗");
 
-      if (error) throw error;
+      if (error) {
+        console.error("ログインエラー:", error);
+        throw error;
+      }
 
+      console.log("2FAチェック開始");
       // 2FAが必要かチェック（エラーハンドリング付き）
       if (data?.user) {
         try {
@@ -41,12 +48,14 @@ export default function LoginScreen() {
           const verifiedFactor = factors?.all?.find(f => f.status === "verified");
 
           if (verifiedFactor) {
+            console.log("2FA必要");
             // 2FA必要
             setFactorId(verifiedFactor.id);
             setShow2FA(true);
             setLoading(false);
             return;
           }
+          console.log("2FA不要");
         } catch (mfaError) {
           // 2FAチェックでエラーが発生しても、通常ログインを続行
           console.warn("2FAチェックエラー:", mfaError);
@@ -54,11 +63,14 @@ export default function LoginScreen() {
       }
 
       // 2FA不要の場合、または2FAチェックでエラーの場合、通常ログイン完了
+      console.log("ログイン成功、ホームへ遷移");
       router.replace("/(tabs)");
     } catch (e: any) {
+      console.error("ログイン失敗:", e);
       setError(e.message || "ログインに失敗しました");
     } finally {
       if (!show2FA) {
+        console.log("ログイン処理終了");
         setLoading(false);
       }
     }

@@ -95,11 +95,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // 15秒のタイムアウト（Web環境を考慮）
+    // 30秒のタイムアウト（ネットワーク遅延を考慮）
     const timeout = setTimeout(() => {
-      console.warn("認証チェックがタイムアウトしました（15秒）");
+      console.warn("認証チェックがタイムアウトしました（30秒）");
       setIsLoading(false);
-    }, 15000);
+    }, 30000);
 
     initAuth().finally(() => clearTimeout(timeout));
 
