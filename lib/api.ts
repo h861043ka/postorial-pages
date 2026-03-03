@@ -350,7 +350,7 @@ export async function createPost(params: {
     image_url: params.imageUrl || null,
     images: imagesToSave.length > 0 ? imagesToSave : null,
     video_url: params.videoUrl || null,
-    video_thumbnail: params.videoThumbnail || null,
+    // video_thumbnail: データベースにカラムが存在しないため削除
     file_url: params.fileUrl || null,
     file_name: params.fileName || null,
     location_lat: params.locationLat || null,
