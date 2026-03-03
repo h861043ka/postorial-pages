@@ -31,7 +31,9 @@ export async function uploadImage(uri: string, userId: string): Promise<string> 
     if (ext === "png") mime = "image/png";
   }
   const ext = mime.includes("png") ? "png" : "jpg";
-  const fileName = `${userId}/${Date.now()}.${ext}`;
+  // 重複を避けるためランダム文字列を追加
+  const random = Math.random().toString(36).substring(2, 15);
+  const fileName = `${userId}/${Date.now()}_${random}.${ext}`;
 
   const { error } = await supabase.storage
     .from("media")
@@ -71,7 +73,9 @@ export async function uploadVideo(uri: string, userId: string): Promise<string> 
     else if (ext === "webm") mime = "video/webm";
   }
   const ext = mime.includes("quicktime") ? "mov" : (mime.includes("webm") ? "webm" : "mp4");
-  const fileName = `${userId}/videos/${Date.now()}.${ext}`;
+  // 重複を避けるためランダム文字列を追加
+  const random = Math.random().toString(36).substring(2, 15);
+  const fileName = `${userId}/videos/${Date.now()}_${random}.${ext}`;
 
   const { error } = await supabase.storage
     .from("media")
