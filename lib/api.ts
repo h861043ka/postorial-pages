@@ -342,27 +342,34 @@ export async function createPost(params: {
   // images配列があればそれを使用、なければimageUrlを配列化
   const imagesToSave = params.images || (params.imageUrl ? [params.imageUrl] : []);
 
+  const postData = {
+    user_id: user.id,
+    content: params.content,
+    reply_to: params.replyTo || null,
+    quote_post_id: params.quotePostId || null,
+    image_url: params.imageUrl || null,
+    images: imagesToSave.length > 0 ? imagesToSave : null,
+    video_url: params.videoUrl || null,
+    video_thumbnail: params.videoThumbnail || null,
+    file_url: params.fileUrl || null,
+    file_name: params.fileName || null,
+    location_lat: params.locationLat || null,
+    location_lng: params.locationLng || null,
+    location_name: params.locationName || null,
+  };
+
+  console.log("createPost: 投稿データ:", postData);
+
   const { data, error } = await supabase
     .from("posts")
-    .insert({
-      user_id: user.id,
-      content: params.content,
-      reply_to: params.replyTo || null,
-      quote_post_id: params.quotePostId || null,
-      image_url: params.imageUrl || "", // 後方互換性のため残す
-      images: imagesToSave,
-      video_url: params.videoUrl || null,
-      video_thumbnail: params.videoThumbnail || null,
-      file_url: params.fileUrl || "",
-      file_name: params.fileName || "",
-      location_lat: params.locationLat || null,
-      location_lng: params.locationLng || null,
-      location_name: params.locationName || "",
-    })
+    .insert(postData)
     .select(`*, user:profiles!posts_user_id_fkey(*)`)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error("createPost: エラー:", error);
+    throw error;
+  }
   return data;
 }
 

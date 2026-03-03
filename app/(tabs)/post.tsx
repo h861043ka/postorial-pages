@@ -183,7 +183,12 @@ export default function PostScreen() {
       router.back();
     } catch (e: any) {
       console.error("投稿エラー詳細:", e);
-      const errorMsg = e.message || "投稿に失敗しました";
+      console.error("エラーメッセージ:", e.message);
+      console.error("エラー詳細:", e.details);
+      console.error("エラーヒント:", e.hint);
+      console.error("エラーコード:", e.code);
+      if (e.error) console.error("ネストされたエラー:", e.error);
+      const errorMsg = e.message || e.error_description || e.hint || e.details || "投稿に失敗しました";
       Alert.alert("エラー", errorMsg);
     } finally {
       setPosting(false);
