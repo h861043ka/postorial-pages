@@ -213,6 +213,14 @@ export default function SettingsScreen() {
         <Ionicons name="chevron-forward" size={20} color="#8e8e93" />
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/blocked-muted-users")}>
+        <View style={styles.menuLeft}>
+          <Ionicons name="ban-outline" size={22} color="#14171a" />
+          <Text style={styles.menuText}>ブロック・ミュート</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#8e8e93" />
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/privacy-policy")}>
         <View style={styles.menuLeft}>
           <Ionicons name="shield-checkmark-outline" size={22} color="#14171a" />
@@ -234,7 +242,7 @@ export default function SettingsScreen() {
           <Ionicons name="information-circle-outline" size={22} color="#14171a" />
           <Text style={styles.menuText}>バージョン</Text>
         </View>
-        <Text style={styles.versionText}>1.0.0</Text>
+        <Text style={styles.versionText}>1.0.2</Text>
       </View>
 
       <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
