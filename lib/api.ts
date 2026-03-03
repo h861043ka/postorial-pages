@@ -342,21 +342,28 @@ export async function createPost(params: {
   // images配列があればそれを使用、なければimageUrlを配列化
   const imagesToSave = params.images || (params.imageUrl ? [params.imageUrl] : []);
 
-  const postData = {
+  // データベースに存在するカラムのみを使用
+  const postData: any = {
     user_id: user.id,
     content: params.content,
     reply_to: params.replyTo || null,
     quote_post_id: params.quotePostId || null,
     image_url: params.imageUrl || null,
-    images: imagesToSave.length > 0 ? imagesToSave : null,
-    video_url: params.videoUrl || null,
-    // video_thumbnail: データベースにカラムが存在しないため削除
-    file_url: params.fileUrl || null,
-    file_name: params.fileName || null,
-    location_lat: params.locationLat || null,
-    location_lng: params.locationLng || null,
-    location_name: params.locationName || null,
   };
+
+  // images配列が存在する場合のみ追加
+  if (imagesToSave.length > 0) {
+    postData.images = imagesToSave;
+  }
+
+  // 以下のフィールドはデータベースに存在しないためコメントアウト
+  // video_url: データベースに存在しない
+  // video_thumbnail: データベースに存在しない
+  // file_url: データベースに存在しない
+  // file_name: データベースに存在しない
+  // location_lat: データベースに存在しない
+  // location_lng: データベースに存在しない
+  // location_name: データベースに存在しない
 
   console.log("createPost: 投稿データ:", postData);
 
