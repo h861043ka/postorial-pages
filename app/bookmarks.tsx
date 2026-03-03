@@ -17,12 +17,32 @@ export default function BookmarksScreen() {
 
   const loadBookmarks = async () => {
     try {
+      console.log("ブックマーク読み込み開始");
       const data = await getBookmarkedPosts(50);
+      console.log("ブックマークデータ取得:", data?.length || 0, "件");
+
       // データが正しい形式か確認してフィルタリング＆デフォルト値を追加
       const validPosts = (data || [])
-        .filter((post: any) => post && post.id && post.user && post.user.id)
+        .filter((post: any) => {
+          if (!post || !post.id) {
+            console.warn("不正な投稿データ:", post);
+            return false;
+          }
+          if (!post.user || !post.user.id) {
+            console.warn("ユーザー情報が不正:", post.id);
+            return false;
+          }
+          return true;
+        })
         .map((post: any) => ({
           ...post,
+          user: {
+            ...post.user,
+            displayName: post.user.displayName || post.user.username || "名無し",
+            username: post.user.username || "anonymous",
+            avatar: post.user.avatar || "",
+          },
+          content: post.content || "",
           likesCount: post.likesCount || 0,
           repliesCount: post.repliesCount || 0,
           repostsCount: post.repostsCount || 0,
@@ -31,9 +51,12 @@ export default function BookmarksScreen() {
           isReposted: post.isReposted || false,
           isBookmarked: post.isBookmarked !== undefined ? post.isBookmarked : true,
         }));
+
+      console.log("有効なブックマーク:", validPosts.length, "件");
       setPosts(validPosts);
-    } catch (e) {
+    } catch (e: any) {
       console.error("ブックマーク取得エラー:", e);
+      console.error("エラー詳細:", e.message, e.stack);
       setPosts([]); // エラー時は空配列を設定
     } finally {
       setLoading(false);

@@ -42,10 +42,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // タイムアウト付き認証チェック
     const initAuth = async () => {
       try {
+        console.log("認証チェック開始");
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
+        if (error) {
+          console.error("セッション取得エラー:", error);
+          throw error;
+        }
+
+        console.log("セッション取得完了:", session ? "ログイン中" : "未ログイン");
 
         if (session?.user) {
+          console.log("ユーザーID:", session.user.id);
           // BANチェックとプロフィール取得を並列実行
           const [bannedResult, profileResult] = await Promise.all([
             supabase
@@ -60,28 +67,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .maybeSingle()
           ]);
 
+          console.log("BAN/プロフィールチェック完了");
+
           if (bannedResult.data) {
+            console.warn("BANユーザー:", session.user.id);
             await supabase.auth.signOut();
             setUser(null);
             setBannedMessage("このアカウントはご利用いただけません");
             setIsLoading(false);
             return;
           }
-          if (profileResult.data) setUser(toUser(profileResult.data));
+          if (profileResult.data) {
+            console.log("プロフィール設定完了");
+            setUser(toUser(profileResult.data));
+          } else {
+            console.warn("プロフィールが見つかりません");
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("認証チェックエラー:", error);
+        console.error("エラー詳細:", error.message, error.stack);
         // エラーでもアプリは起動させる
+        setUser(null);
       } finally {
+        console.log("認証チェック完了");
         setIsLoading(false);
       }
     };
 
-    // 10秒のタイムアウト
+    // 15秒のタイムアウト（Web環境を考慮）
     const timeout = setTimeout(() => {
-      console.warn("認証チェックがタイムアウトしました");
+      console.warn("認証チェックがタイムアウトしました（15秒）");
       setIsLoading(false);
-    }, 10000);
+    }, 15000);
 
     initAuth().finally(() => clearTimeout(timeout));
 

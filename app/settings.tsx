@@ -242,7 +242,7 @@ export default function SettingsScreen() {
           <Ionicons name="information-circle-outline" size={22} color="#14171a" />
           <Text style={styles.menuText}>バージョン</Text>
         </View>
-        <Text style={styles.versionText}>1.0.4</Text>
+        <Text style={styles.versionText}>1.0.5</Text>
       </View>
 
       <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
