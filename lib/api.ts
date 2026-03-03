@@ -1268,3 +1268,51 @@ export async function getMutedUserIds(): Promise<string[]> {
   if (error) return [];
   return (data || []).map((m: any) => m.muted_user_id);
 }
+
+// ミュート中のユーザー一覧を取得（プロフィール情報付き）
+export async function getMutedUsers() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from("muted_users")
+    .select(`
+      muted_user_id,
+      created_at,
+      profile:profiles!muted_users_muted_user_id_fkey(*)
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((m: any) => ({
+    id: m.profile?.id || m.muted_user_id,
+    username: m.profile?.username || "",
+    displayName: m.profile?.display_name || "",
+    avatar: m.profile?.avatar_url || "",
+    bio: m.profile?.bio || "",
+    mutedAt: m.created_at,
+  }));
+}
+
+// ブロック中のユーザー一覧を取得（プロフィール情報付き）
+export async function getBlockedUsers() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from("blocks")
+    .select(`
+      blocked_id,
+      created_at,
+      profile:profiles!blocks_blocked_id_fkey(*)
+    `)
+    .eq("blocker_id", user.id)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((b: any) => ({
+    id: b.profile?.id || b.blocked_id,
+    username: b.profile?.username || "",
+    displayName: b.profile?.display_name || "",
+    avatar: b.profile?.avatar_url || "",
+    bio: b.profile?.bio || "",
+    blockedAt: b.created_at,
+  }));
+}

@@ -18,9 +18,14 @@ export default function BookmarksScreen() {
   const loadBookmarks = async () => {
     try {
       const data = await getBookmarkedPosts(50);
-      setPosts(data);
+      // データが正しい形式か確認してフィルタリング
+      const validPosts = (data || []).filter((post: any) =>
+        post && post.id && post.user && post.user.id
+      );
+      setPosts(validPosts);
     } catch (e) {
       console.error("ブックマーク取得エラー:", e);
+      setPosts([]); // エラー時は空配列を設定
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -133,7 +133,8 @@ export default function PostScreen() {
       if (!result.canceled && result.assets[0]) {
         setFileUri(result.assets[0].uri);
         setFileName(result.assets[0].name);
-        setImageUri(null);
+        setImageUris([]);
+        setVideoUri(null);
       }
     } catch {}
   };
@@ -166,6 +167,7 @@ export default function PostScreen() {
         images: images.length > 0 ? images : undefined,
         imageUrl: images[0], // 後方互換性のため1枚目を設定
         videoUrl,
+        videoThumbnail: undefined, // サムネイルは未実装
         fileUrl,
         fileName: fileName || undefined,
         locationLat: location?.lat,
