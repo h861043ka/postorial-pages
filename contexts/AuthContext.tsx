@@ -46,25 +46,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
 
         if (session?.user) {
-          // BANチェック
-          const { data: banned } = await supabase
-            .from("banned_users")
-            .select("id")
-            .eq("user_id", session.user.id)
-            .single();
-          if (banned) {
+          // BANチェックとプロフィール取得を並列実行
+          const [bannedResult, profileResult] = await Promise.all([
+            supabase
+              .from("banned_users")
+              .select("id")
+              .eq("user_id", session.user.id)
+              .single(),
+            supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single()
+          ]);
+
+          if (bannedResult.data) {
             await supabase.auth.signOut();
             setUser(null);
             setBannedMessage("このアカウントはご利用いただけません");
             setIsLoading(false);
             return;
           }
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-          if (profile) setUser(toUser(profile));
+          if (profileResult.data) setUser(toUser(profileResult.data));
         }
       } catch (error) {
         console.error("認証チェックエラー:", error);
@@ -86,24 +89,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
-          const { data: banned } = await supabase
-            .from("banned_users")
-            .select("id")
-            .eq("user_id", session.user.id)
-            .single();
-          if (banned) {
+          // BANチェックとプロフィール取得を並列実行
+          const [bannedResult, profileResult] = await Promise.all([
+            supabase
+              .from("banned_users")
+              .select("id")
+              .eq("user_id", session.user.id)
+              .single(),
+            supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single()
+          ]);
+
+          if (bannedResult.data) {
             await supabase.auth.signOut();
             setUser(null);
             setBannedMessage("このアカウントはご利用いただけません");
             return;
           }
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", session.user.id)
-            .single();
-          if (profile) {
-            setUser(toUser(profile));
+          if (profileResult.data) {
+            setUser(toUser(profileResult.data));
             // プッシュ通知を登録
             registerForPushNotificationsAsync().catch(console.error);
           }

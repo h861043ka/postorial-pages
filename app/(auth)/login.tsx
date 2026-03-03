@@ -34,21 +34,26 @@ export default function LoginScreen() {
 
       if (error) throw error;
 
-      // 2FAが必要かチェック
+      // 2FAが必要かチェック（エラーハンドリング付き）
       if (data?.user) {
-        const { data: factors } = await supabase.auth.mfa.listFactors();
-        const verifiedFactor = factors?.all.find(f => f.status === "verified");
+        try {
+          const { data: factors } = await supabase.auth.mfa.listFactors();
+          const verifiedFactor = factors?.all?.find(f => f.status === "verified");
 
-        if (verifiedFactor) {
-          // 2FA必要
-          setFactorId(verifiedFactor.id);
-          setShow2FA(true);
-          setLoading(false);
-          return;
+          if (verifiedFactor) {
+            // 2FA必要
+            setFactorId(verifiedFactor.id);
+            setShow2FA(true);
+            setLoading(false);
+            return;
+          }
+        } catch (mfaError) {
+          // 2FAチェックでエラーが発生しても、通常ログインを続行
+          console.warn("2FAチェックエラー:", mfaError);
         }
       }
 
-      // 2FA不要の場合、通常ログイン完了
+      // 2FA不要の場合、または2FAチェックでエラーの場合、通常ログイン完了
       router.replace("/(tabs)");
     } catch (e: any) {
       setError(e.message || "ログインに失敗しました");
