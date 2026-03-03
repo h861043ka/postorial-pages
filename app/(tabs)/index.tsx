@@ -103,19 +103,27 @@ export default function HomeScreen() {
   };
 
   const handleBookmark = async (postId: string) => {
+    // 先に現在の状態を取得
+    const post = posts.find((p) => p.id === postId);
+    const wasBookmarked = post?.isBookmarked || false;
+
+    // UIを先に更新
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId ? { ...p, isBookmarked: !p.isBookmarked } : p
       )
     );
+
     try {
-      const post = posts.find((p) => p.id === postId);
-      if (post?.isBookmarked) {
+      // 元の状態に基づいて処理
+      if (wasBookmarked) {
         await removeBookmark(postId);
       } else {
         await addBookmark(postId);
       }
-    } catch {
+    } catch (e) {
+      console.error("ブックマークエラー:", e);
+      // エラー時は元に戻す
       await loadPosts();
     }
   };

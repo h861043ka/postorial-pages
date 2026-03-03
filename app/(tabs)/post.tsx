@@ -182,7 +182,9 @@ export default function PostScreen() {
       setLocation(null);
       router.back();
     } catch (e: any) {
-      Alert.alert("エラー", e.message || "投稿に失敗しました");
+      console.error("投稿エラー詳細:", e);
+      const errorMsg = e.message || "投稿に失敗しました";
+      Alert.alert("エラー", errorMsg);
     } finally {
       setPosting(false);
     }

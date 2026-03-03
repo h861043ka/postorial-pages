@@ -347,8 +347,8 @@ export async function createPost(params: {
       quote_post_id: params.quotePostId || null,
       image_url: params.imageUrl || "", // 後方互換性のため残す
       images: imagesToSave,
-      video_url: params.videoUrl || "",
-      video_thumbnail: params.videoThumbnail || "",
+      video_url: params.videoUrl || null,
+      video_thumbnail: params.videoThumbnail || null,
       file_url: params.fileUrl || "",
       file_name: params.fileName || "",
       location_lat: params.locationLat || null,
