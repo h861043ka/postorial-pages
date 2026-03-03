@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from("banned_users")
         .select("id")
         .eq("user_id", data.user.id)
-        .single();
+        .maybeSingle();  // .single()ではなく.maybeSingle()を使用
       if (banned) {
         await supabase.auth.signOut();
         throw new Error("このアカウントはご利用いただけません");
